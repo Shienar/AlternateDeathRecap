@@ -35,8 +35,9 @@ local lastResult = 0
 local shieldCount = 0
 function ADR.OnCombatEvent(eventCode, result, isError, abilityName, abilityGraphic, abilityActionSlotType, sourceName, sourceType, targetName, targetType, hitValue, powerType, damageType, _log, sourceUnitID, targetUnitID, abilityID, overflow)
 	
-	--Remove ^M or ^Mx or similar unwanted characters on the sourceName.
+	--Remove ^M or ^Mx or similar unwanted characters on the source/ability name
 	sourceName = zo_strformat(SI_UNIT_NAME, sourceName)
+	abilityName = zo_strformat(SI_ABILITY_NAME, abilityName)
 	--We don't want revive snare/stun events to be tracked.
 	if string.find(string.lower(abilityName), "revive") ~= nil then return end
 	--We only want to display this once, so only one type is being tracked with all other types returning here.
