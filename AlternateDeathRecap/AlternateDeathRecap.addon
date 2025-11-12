@@ -1,7 +1,8 @@
 ## Title: AlternateDeathRecap
 ## Author: Shienar
-## APIVersion: 101047
-## Version: 1.0.0
+## APIVersion: 101047 101048
+## AddOnVersion: 30003
+## Version: 3.0.3
 ## IsLibrary: False
 ## ConsoleDependsOn: LibHarvensAddonSettings>=20004
 ## PCDependsOn: LibAddonMenu-2.0>=40
