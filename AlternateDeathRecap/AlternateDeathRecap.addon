@@ -4,7 +4,7 @@
 ## AddOnVersion: 30003
 ## Version: 3.0.3
 ## IsLibrary: False
-## ConsoleDependsOn: LibHarvensAddonSettings>=20004
+## OptionalDependsOn: LibHarvensAddonSettings>=20004
 ## PCDependsOn: LibAddonMenu-2.0>=40
 ## SavedVariables: ADRSavedVariables
 

@@ -653,8 +653,6 @@ local function instantAnimate(self)
     self.hintTimeline:PlayInstantlyToEnd()
 end
 
-
-
 ZO_PreHook(DEATH_RECAP, "SetupAttacks", SetupAttacks)
 
 
@@ -706,15 +704,6 @@ ZO_PreHook(DEATH_RECAP, "Animate", function()
 	end
 end)
 
-
-
-
-
-
-
-
-
-
 local function scrollToEnd(self)
 	if currentlyAnimating == false then -- idk, prob a better way to do this
 		ZO_ScrollAnimation_MoveWindow(DEATH_RECAP.scrollContainer, 100)
@@ -751,6 +740,8 @@ function ADR.Initialize()
 	--SETTINGS:
 
 	if IsConsoleUI() then
+		if not LibHarvensAddonSettings then return end
+		
 		local settings = LibHarvensAddonSettings:AddAddon("Alternate Death Recap")
 
 		local generalSection = {type = LibHarvensAddonSettings.ST_SECTION,label = "General",}
