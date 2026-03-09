@@ -34,7 +34,7 @@ local allowedResults = {
 local lastResult = 0
 local shieldCount = 0
 function ADR.OnCombatEvent(eventCode, result, isError, abilityName, abilityGraphic, abilityActionSlotType, sourceName, sourceType, targetName, targetType, hitValue, powerType, damageType, _log, sourceUnitID, targetUnitID, abilityID, overflow)
-	
+
 	--Remove ^M or ^Mx or similar unwanted characters on the source/ability name
 	sourceName = zo_strformat(SI_UNIT_NAME, sourceName)
 	abilityName = zo_strformat(SI_ABILITY_NAME, abilityName)
