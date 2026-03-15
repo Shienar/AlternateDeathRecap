@@ -1,15 +1,15 @@
 ## Title: AlternateDeathRecap
 ## Author: Shienar
 ## APIVersion: 101048 101049
-## AddOnVersion: 30003
-## Version: 3.0.3
+## AddOnVersion: 30100
+## Version: 3.1
 ## IsLibrary: False
 ## OptionalDependsOn: LibHarvensAddonSettings>=20004
 ## PCDependsOn: LibAddonMenu-2.0>=40
 ## SavedVariables: ADRSavedVariables
 
 queue.lua
+PC/settings.lua
+Console/settings.lua
 main.lua
 animations.xml
-
-PC/settings.lua
