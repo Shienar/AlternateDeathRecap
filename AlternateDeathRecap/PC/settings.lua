@@ -21,7 +21,6 @@ function ADR.SetupPCSettings()
 			name = "Compact Mode",
 			tooltip = "Replaces the default death recap format with a more compact version.",
 			width = "full",
-			requiresReload = true,
 			getFunc = function() return ADR.savedVariables.isCompact end,
 			setFunc = function(value) ADR.savedVariables.isCompact = value end,
 		},

@@ -38,6 +38,7 @@ function ADR.OnCombatEvent(eventCode, result, isError, abilityName, abilityGraph
 	--Remove ^M or ^Mx or similar unwanted characters on the source/ability name
 	sourceName = zo_strformat(SI_UNIT_NAME, sourceName)
 	abilityName = zo_strformat(SI_ABILITY_NAME, abilityName)
+
 	--We don't want revive snare/stun events to be tracked.
 	if string.find(string.lower(abilityName), "revive") ~= nil then return end
 	--We only want to display this once, so only one type is being tracked with all other types returning here.
@@ -77,7 +78,7 @@ function ADR.OnCombatEvent(eventCode, result, isError, abilityName, abilityGraph
 		end
 		
 		--Only track one cast per skill.
-		if hitValue > 0 and (ADR.lastCastTimes[abilityName] == nil or (GetGameTimeMilliseconds() - ADR.lastCastTimes[abilityName]) > 500) then -- imo this shouldnt be here, might mess with data
+		if hitValue > 0 and (ADR.lastCastTimes[abilityName] == nil or (GetGameTimeMilliseconds() - ADR.lastCastTimes[abilityName]) > 500) then
 			ADR.lastCastTimes[abilityName] = GetGameTimeMilliseconds()
 		else
 			return
@@ -104,8 +105,6 @@ function ADR.OnCombatEvent(eventCode, result, isError, abilityName, abilityGraph
 
 	lastResult = result
 
-
-
 	--Don't track events with empty info.
 	if sourceName == "" or
 		abilityName == "" or
@@ -113,7 +112,6 @@ function ADR.OnCombatEvent(eventCode, result, isError, abilityName, abilityGraph
 			return
 	end
 
-	
 	local attackInfo = {
 		resultType = result,
 		attackName = abilityName,
@@ -174,7 +172,6 @@ DEATH_RECAP.attackPool:SetFactory(function(objectKey)
         control.timeline = ANIMATION_MANAGER:CreateTimelineFromVirtual("AlternativeDeathRecapAttackAnimation")
         local animationSpeed = ADR.savedVariables.animationSpeed/75 -- total length is 75ms, so the desired playback rate is desiredMS/75
 
-
         if control.timeline then
             local nestedTimeline = control.timeline:GetAnimationTimeline(1)
             if nestedTimeline then
@@ -214,12 +211,11 @@ DEATH_RECAP.attackPool:SetFactory(function(objectKey)
             end
         end
     end
-    
+
     return control
 end)
 
 DEATH_RECAP.attackPool:SetCustomFactoryBehavior(function() end)
-
 
 local prefetchingControls = true
 
@@ -227,9 +223,7 @@ local currentIndex = 1
 function ADR.prefetchControls() -- prefetch maxAttacks amount of controls, to avoid stutters when loading all maxAttacks number of controls at first death.
 	if (prefetchingControls == true) and (currentIndex < ADR.savedVariables.maxAttacks) then
 		--prefetch
-		--d("Checking object at index "..currentIndex)
 		if DEATH_RECAP.attackPool:GetActiveObject(currentIndex) == nil then -- if the object is already active, dont try to mess with it.
-			--d("Making object "..tostring(currentIndex))
 			DEATH_RECAP.attackPool:AcquireObject(currentIndex)
 			DEATH_RECAP.attackPool:ReleaseObject(currentIndex)
 			currentIndex = currentIndex + 1
@@ -237,7 +231,6 @@ function ADR.prefetchControls() -- prefetch maxAttacks amount of controls, to av
 		end
 	end
 	-- unregister
-	--d("Stopped making objects at "..tostring(currentIndex))
 	prefetchingControls = false
 	EVENT_MANAGER:UnregisterForUpdate(string.format("%s Prefetching", ADR.name))
 end
@@ -247,7 +240,6 @@ local function registerPrefetch() -- run on playeractivated
 	EVENT_MANAGER:RegisterForUpdate(string.format("%s Prefetching", ADR.name), 2000, ADR.prefetchControls)
 	EVENT_MANAGER:UnregisterForEvent(string.format("%s Start Prefetching", ADR.name), EVENT_PLAYER_ACTIVATED)
 end
-
 EVENT_MANAGER:RegisterForEvent(string.format("%s Start Prefetching", ADR.name), EVENT_PLAYER_ACTIVATED, registerPrefetch)
 
 -- DeathRecap:SetupAttacks
@@ -675,7 +667,6 @@ local function animate(self) -- scroll the window to the bottom
         end
         
 	end
-	--d("Time of "..delay)
 	ADR.animation:SetDuration(delay + HINT_ANIMATION_DELAY_MS )
 
     ADR.timeline:SetAnimationOffset(ADR.animation, extraDelay/2)
@@ -1051,8 +1042,13 @@ function ADR.Initialize()
 		end)
 	else
 		DEATH_RECAP.scrollContainer:SetMouseEnabled(true)
-		local scrollSensitivityBoost = ADR.savedVariables.scrollSensitivityBoost or 0
-		DEATH_RECAP.scrollContainer:SetHandler("OnMouseWheel", function(self, delta) ZO_ScrollRelative(DEATH_RECAP.scrollContainer, -delta*40*(1+scrollSensitivityBoost/100)) end)
+		--Must pass scrollSensitivityBoost as a table reference to avoid needing to reload ui.
+		if ADR.savedVariables.scrollSensitivityBoost then
+			DEATH_RECAP.scrollContainer:SetHandler("OnMouseWheel", function(self, delta) ZO_ScrollRelative(DEATH_RECAP.scrollContainer, -delta*40*(1+ADR.savedVariables.scrollSensitivityBoost/100)) end)
+		else
+			DEATH_RECAP.scrollContainer:SetHandler("OnMouseWheel", function(self, delta) ZO_ScrollRelative(DEATH_RECAP.scrollContainer, -delta*40*(1/100)) end)
+		end
+		
 	end
 
 	local animation, timeline = ZO_CreateScrollAnimation(DEATH_RECAP.scrollContainer)
