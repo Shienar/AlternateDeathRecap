@@ -10,7 +10,6 @@ function ADR.SetupPCSettings()
 	}
 
 	local optionsTable = {
-
 		{
 			type = "description",
 			title = "[General]",
@@ -36,14 +35,19 @@ function ADR.SetupPCSettings()
 		{
 			type = "slider",
 			name = "Animation Length (ms)",
-			tooltip = "Set the length of each attack animation in the death recap.",
+			tooltip = "Set the length the animation in the death recap.",
 			min = 10,
 			max = 1000,
 			step = 10,
-			requiresReload = true,
 			width = "full",
 			getFunc = function() return ADR.savedVariables.animationSpeed end,
-			setFunc = function(value) ADR.savedVariables.animationSpeed = value end,
+			setFunc = function(value) 
+				ADR.savedVariables.animationSpeed = value 
+				EVENT_MANAGER:RegisterForUpdate(ADR.name.."Post Settings Change", 1500, function()
+					ADR.updateExistingAnimations()
+					EVENT_MANAGER:UnregisterForUpdate(ADR.name.."Post Settings Change")
+				end)
+			end,
 		},
 		{
 			type = "slider",
@@ -83,6 +87,17 @@ function ADR.SetupPCSettings()
 			width = "full",
 			getFunc = function() return ADR.savedVariables.scrollSensitivityBoost end,
 			setFunc = function(value) ADR.savedVariables.scrollSensitivityBoost = value end,
+		},
+
+		
+		{
+			type = "dropdown",
+			name = "Health Display",
+			tooltip = "How would you like your saved current/max health to be displayed per attack in the recap?.",
+			choices = {"Current/Max", "Current", "Percentage", "None"},
+			getFunc = function() return ADR.savedVariables.healthDisplay or "Current/Max" end,
+			setFunc = function(var) ADR.savedVariables.healthDisplay = var end,
+			width = "full",
 		},
 
 		{

@@ -215,6 +215,57 @@ DEATH_RECAP.attackPool:SetFactory(function(objectKey)
     return control
 end)
 
+function ADR.updateExistingAnimations()
+	for n = 1, 50 do
+		local control = GetControl("ZO_DeathRecapScrollContainerScrollChildAttacks"..n)
+		if not control or not control.timeline then return end
+
+		local nestedTimeline = control.timeline:GetAnimationTimeline(1)
+		local animationSpeed = ADR.savedVariables.animationSpeed/75 -- total length is 75ms, so the desired playback rate is desiredMS/75
+
+		if nestedTimeline then
+			local animation = nestedTimeline:GetAnimation(1) --Icon alpha animation with original duration 10
+			animation:SetDuration(10 * animationSpeed)
+
+			animation = nestedTimeline:GetAnimation(2) --Icon scale animation with original duration 25
+			animation:SetDuration(25 * animationSpeed)
+
+			animation = nestedTimeline:GetAnimation(3) --Icon scale animation with original duration 50
+			animation:SetDuration(50 * animationSpeed)
+
+			animation = nestedTimeline:GetAnimation(4) --Style alpha animation with original duration 10
+			animation:SetDuration(10 * animationSpeed)
+
+			animation = nestedTimeline:GetAnimation(5) --Style scale animation with original duration 25
+			animation:SetDuration(25 * animationSpeed)
+
+			animation = nestedTimeline:GetAnimation(6) --Style scale animation with original duration 50
+			animation:SetDuration(50 * animationSpeed)
+
+			animation = nestedTimeline:GetAnimation(7) --Label alpha animation with original duration 50
+			animation:SetDuration(50 * animationSpeed)
+
+			animation = nestedTimeline:GetAnimation(8) --DOT Alpha animation with original duration 10
+			animation:SetDuration(10 * animationSpeed)
+
+			animation = nestedTimeline:GetAnimation(9) --DOT Scale  animation with original duration 25
+			animation:SetDuration(25 * animationSpeed)
+
+			animation = nestedTimeline:GetAnimation(10) --DOT Scale animation with original duration 50
+			animation:SetDuration(50 * animationSpeed)
+
+			animation = nestedTimeline:GetAnimation(11) --Health alpha animation with original duration 10
+			animation:SetDuration(10 * animationSpeed)
+
+			animation = nestedTimeline:GetAnimation(12) --Health scale animation with original duration 25
+			animation:SetDuration(25 * animationSpeed)
+
+			animation = nestedTimeline:GetAnimation(13) --Health scale animation with original duration 50
+			animation:SetDuration(50 * animationSpeed)
+        end
+	end
+end
+
 DEATH_RECAP.attackPool:SetCustomFactoryBehavior(function() end)
 
 local prefetchingControls = true
@@ -341,7 +392,11 @@ local function SetupAttacks(self) -- https://github.com/esoui/esoui/blob/1453053
 				health_display:SetAnchor(TOPRIGHT, attackCount, BOTTOMRIGHT, 0, -2)
 			end
 			health_display:SetHidden(false)
-			health_display:SetText(string.format("%.2f%% HP", 100 * rowData.currentHealth/rowData.currentMaxHealth))
+			if ADR.savedVariables.healthDisplay == "Current" then health_display:SetText(ZO_CommaDelimitNumber(rowData.currentHealth).." HP")
+			elseif ADR.savedVariables.healthDisplay == "Percentage" then health_display:SetText(string.format("%.2f%% HP", 100 * rowData.currentHealth/rowData.currentMaxHealth))
+			elseif ADR.savedVariables.healthDisplay == "None" then health_display:SetText("")
+			else health_display:SetText(ZO_CommaDelimitNumber(rowData.currentHealth).."/"..ZO_CommaDelimitNumber(rowData.currentMaxHealth).." HP") end --"Current/Max"
+			
 			if rowData.currentHealth/rowData.currentMaxHealth > 0.66 then health_display:SetColor(0.25, 1, 0.25, 1)
 			elseif rowData.currentHealth/rowData.currentMaxHealth > 0.33 then health_display:SetColor(1, 1, 0.25, 1)
 			else health_display:SetColor(1, 0.25, 0.25, 1) end
@@ -575,7 +630,11 @@ local function SetupAttacks(self) -- https://github.com/esoui/esoui/blob/1453053
 
 			compactTextAttack:SetText(rowData.attackName)
 			compactTextAttacker:SetText(rowData.attackerName)
-			compactTextHealth:SetText(string.format("(%.02f%% HP)", 100 * rowData.currentHealth/rowData.currentMaxHealth))
+			if ADR.savedVariables.healthDisplay == "Current" then compactTextHealth:SetText("("..ZO_CommaDelimitNumber(rowData.currentHealth).." HP)")
+			elseif ADR.savedVariables.healthDisplay == "Percentage" then compactTextHealth:SetText(string.format("(%.2f%% HP)", 100 * rowData.currentHealth/rowData.currentMaxHealth))
+			elseif ADR.savedVariables.healthDisplay == "None" then compactTextHealth:SetText("")
+			else compactTextHealth:SetText("("..ZO_CommaDelimitNumber(rowData.currentHealth).."/"..ZO_CommaDelimitNumber(rowData.currentMaxHealth).." HP)") end --"Current/Max"
+
 			if rowData.currentHealth/rowData.currentMaxHealth > 0.66 then compactTextHealth:SetColor(0.25, 1, 0.25, 1)
 			elseif rowData.currentHealth/rowData.currentMaxHealth > 0.33 then compactTextHealth:SetColor(1, 1, 0.25, 1)
 			else compactTextHealth:SetColor(1, 0.25, 0.25, 1) end
@@ -726,6 +785,7 @@ function ADR.Initialize()
 		trackFeared = true,
 		animationSpeed = 250,
 		animationsEnabled = true,
+		healthDisplay = "Current/Max",
 	}
 	ADR.savedVariables = ZO_SavedVars:NewAccountWide("ADRSavedVariables", 1, nil, ADR.defaults, GetWorldName())
 

@@ -24,41 +24,16 @@ function ADR.InitConsoleSettings()
         disable = function() return false end,
     }
 
-    --reusing reload notificaiton from https://github.com/esoui/esoui/blob/1453053596e7f731ef854638c9975a4f474eba53/esoui/pregameandingame/addons/gamepad/zo_addonmanager_gamepad.lua#L606
-    local reloadRecommended = false
-
-    --The hooking logic here is kinda stupid. It works for now
-    local settingScene = nil
-    ZO_PostHook(ZO_Scene, "New", function(scene, y, z)
-        if not settingScene then --Only do this once
-            settingScene = SCENE_MANAGER:GetScene("LibHarvensAddonSettingsScene") --Same scene for all addons 
-            if settingScene then --Only do this after the scene has been initialized.
-                settingScene:SetHideSceneConfirmationCallback(function(scene, nextSceneName, bypassHideSceneConfirmationReason) 
-                    if reloadRecommended and not bypassHideSceneConfirmationReason then
-                        ZO_Dialogs_ShowGamepadDialog("GAMEPAD_CONFIRM_LEAVE_ADDON_MANAGER",
-                        {
-                            confirmCallback = function()
-                                ReloadUI("ingame")
-                            end,
-                            declineCallback = function()
-                                reloadRecommended = false
-                                scene:AcceptHideScene()
-                            end,
-                        })
-                    else
-                        scene:AcceptHideScene()
-                    end
-                end)
-            end
-        end
-    end)
     local setAnimationSpeed = {
         type = LibHarvensAddonSettings.ST_SLIDER,
         label = "Animation Length",
-        tooltip = "Set the length of each attack animation in the death recap. This will only take affect after a reload of your UI.",
+        tooltip = "Set the length of the animation in the death recap.",
         setFunction = function(value)
-            ADR.savedVariables.animationSpeed = value
-            reloadRecommended = true
+				ADR.savedVariables.animationSpeed = value 
+				EVENT_MANAGER:RegisterForUpdate(ADR.name.."Post Settings Change", 1500, function()
+					ADR.updateExistingAnimations()
+					EVENT_MANAGER:UnregisterForUpdate(ADR.name.."Post Settings Change")
+				end)
         end,
         getFunction = function()
             return ADR.savedVariables.animationSpeed
@@ -148,6 +123,23 @@ function ADR.InitConsoleSettings()
         format = "%d", --value format
         disable = function() return false end,
     }
+
+    local setHealthDisplayType = {
+		type = LibHarvensAddonSettings.ST_DROPDOWN,
+		label = "Health Display",
+		tooltip = "Choose who the tracker will focus on.",
+		items = {
+			{name = "Current/Max", data = 1},
+			{name = "Current", data = 2},
+			{name = "Percentage", data = 3},
+			{name = "None", data = 4}
+		},
+		getFunction = function() return ADR.savedVariables.healthDisplay or "Current/Max" end,
+		setFunction = function(control, itemName, itemData)
+		    ADR.savedVariables.healthDisplay = itemName
+		end,
+		default = 1
+	}
 
     local trackHealAbsorb = {
         type = LibHarvensAddonSettings.ST_CHECKBOX, --setting type
@@ -261,5 +253,6 @@ function ADR.InitConsoleSettings()
         disable = function() return false end,
     }
 
-    settings:AddSettings({generalSection, toggleCompact, setAnimationSpeed, toggleAnimationDisplaying, setMaxAttacks, setMaxTime, setSensitivity, filterSection, trackHealAbsorb, trackDodged, trackInterrupted, trackRooted, trackSnared, trackSilenced, trackStunned, trackFeared })
+    settings:AddSettings({generalSection, toggleCompact, setAnimationSpeed, toggleAnimationDisplaying, setMaxAttacks, setMaxTime, setSensitivity, setHealthDisplayType, 
+                            filterSection, trackHealAbsorb, trackDodged, trackInterrupted, trackRooted, trackSnared, trackSilenced, trackStunned, trackFeared })
 end
