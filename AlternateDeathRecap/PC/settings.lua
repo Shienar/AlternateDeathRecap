@@ -113,6 +113,14 @@ function ADR.SetupPCSettings()
 
 		{
 			type = "checkbox",
+			name = "Heals",
+			tooltip = "Only show this event in recap when this option is set to ON.",
+			width = "half",
+			getFunc = function() return ADR.savedVariables.trackHeals end,
+			setFunc = function(value) ADR.savedVariables.trackHeals = value end,
+		},
+		{
+			type = "checkbox",
 			name = "Heal Absorb",
 			tooltip = "Only show this event in recap when this option is set to ON.",
 			width = "half",

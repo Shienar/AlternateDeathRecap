@@ -43,8 +43,9 @@ function ADR.OnCombatEvent(eventCode, result, isError, abilityName, abilityGraph
 	if string.find(string.lower(abilityName), "revive") ~= nil then return end
 	--We only want to display this once, so only one type is being tracked with all other types returning here.
 	if string.find(string.lower(abilityName), "break free") ~= nil and sourceType ~= COMBAT_UNIT_TYPE_PLAYER then return end
-	--I don't know what this 0 damage attack is that I get from random bosses, but I don't want to see it.
+	--0 damage attacks that are part of certain bossfights. Ignore them.
 	if string.find(string.lower(abilityName), "vigilance") ~= nil then return end
+	if string.find(string.lower(abilityName), "music musicer") ~= nil then return end
 
 	if lastResult == ACTION_RESULT_DAMAGE_SHIELDED then -- next attack will be the thing which causes the sheild to take damage
 		if result == ACTION_RESULT_DAMAGE_SHIELDED then
@@ -130,7 +131,7 @@ function ADR.OnCombatEvent(eventCode, result, isError, abilityName, abilityGraph
 		if attackInfo.attackOverflow ~= 0 then
 			attackInfo.wasKillingBlow = true
 		end
-	elseif (resultType == "heal" and hitValue == 0) then
+	elseif (resultType == "heal" and (hitValue == 0 or not ADR.savedVariables.trackHeals)) then
 		return
 	elseif resultType == "special" then
 		if not (result == ACTION_RESULT_ABSORBED  or 
@@ -783,6 +784,7 @@ function ADR.Initialize()
 		trackSnared = true,
 		trackStunned = true,
 		trackFeared = true,
+		trackHeals = true,
 		animationSpeed = 250,
 		animationsEnabled = true,
 		healthDisplay = "Current/Max",

@@ -141,6 +141,20 @@ function ADR.InitConsoleSettings()
 		default = 1
 	}
 
+    local trackHeals = {
+        type = LibHarvensAddonSettings.ST_CHECKBOX, --setting type
+        label = "Heals", 
+        tooltip = "Only show this event in recap when this option is set to ON.",
+        default = ADR.defaults.trackHeals,
+        setFunction = function(state) 
+            ADR.savedVariables.trackHeals = state
+        end,
+        getFunction = function() 
+            return ADR.savedVariables.trackHeals
+        end,
+        disable = function() return false end,
+    }
+
     local trackHealAbsorb = {
         type = LibHarvensAddonSettings.ST_CHECKBOX, --setting type
         label = "Heal Absorb", 
@@ -254,5 +268,5 @@ function ADR.InitConsoleSettings()
     }
 
     settings:AddSettings({generalSection, toggleCompact, setAnimationSpeed, toggleAnimationDisplaying, setMaxAttacks, setMaxTime, setSensitivity, setHealthDisplayType, 
-                            filterSection, trackHealAbsorb, trackDodged, trackInterrupted, trackRooted, trackSnared, trackSilenced, trackStunned, trackFeared })
+                            filterSection, trackHeals, trackHealAbsorb, trackDodged, trackInterrupted, trackRooted, trackSnared, trackSilenced, trackStunned, trackFeared })
 end
